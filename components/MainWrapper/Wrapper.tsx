@@ -7,8 +7,10 @@ import {any} from "prop-types";
 
 // @ts-ignore
 const Wrapper = ({children}) => {
+
     const [cdn, setCDN] = useState({}); // Initial CDN value
     const [channels, setChannels] = useState([]); // Initial CDN value
+
     return (
         <div>
             <ChannelContext.Provider value={{ channels, setChannels }}>

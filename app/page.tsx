@@ -12,6 +12,7 @@ import {ChannelContext} from "@/contexts/Channels";
 export default function Home() {
 
     const [data, setData] = useState([]);
+    // @ts-ignore
     const { channels, setChannels } = useContext(ChannelContext);
 
     useEffect(() => {
