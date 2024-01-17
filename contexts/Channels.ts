@@ -2,4 +2,4 @@
 
 import { createContext } from 'react';
 
-export const ChannelContext = createContext([]);
+export const ChannelContext = createContext({});

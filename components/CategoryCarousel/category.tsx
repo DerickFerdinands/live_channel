@@ -21,7 +21,7 @@ const Category = ({data}) => {
                 className="w-full max-w-full bor"
             >
                 <CarouselContent >
-                    {data.data.map((channel, index) => (
+                    {data.data.map((channel:any, index:any) => (
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-2/12">
                             <div className="p-1">
                                 <Card>

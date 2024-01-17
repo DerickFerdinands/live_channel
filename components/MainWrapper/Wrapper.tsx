@@ -9,7 +9,7 @@ import {any} from "prop-types";
 const Wrapper = ({children}) => {
 
     const [cdn, setCDN] = useState({}); // Initial CDN value
-    const [channels, setChannels] = useState([]); // Initial CDN value
+    const [channels, setChannels] = useState({}); // Initial CDN value
 
     return (
         <div>
