@@ -33,6 +33,7 @@ const Page = () => {
     const [text, setText] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
 
+    // @ts-ignore
     const handleEmojiSelect = (emoji) => {
         setText((txt: string) => txt + emoji.emoji);
     };
@@ -41,6 +42,7 @@ const Page = () => {
         (_, i, a) => `v1.2.0-beta.${a.length - i}`
     )
 
+    // @ts-ignore
     return (
         <>
             <div className={"h-screen max-h-screen "}>
