@@ -22,7 +22,9 @@ export default function RootLayout({
     <html lang="en">
 
       <body className={`${inter.className} dark`}>
-      <Wrapper children={children}/>
+      <Wrapper>
+      {children}
+      </Wrapper>
       {/*{children}*/}
       </body>
     </html>
