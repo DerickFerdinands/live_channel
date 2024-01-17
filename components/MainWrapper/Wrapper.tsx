@@ -3,7 +3,9 @@
 import {CDNContext} from "@/contexts/cdn";
 import {ChannelContext} from "@/contexts/Channels";
 import {useState} from "react";
+import {any} from "prop-types";
 
+// @ts-ignore
 const Wrapper = ({children}) => {
     const [cdn, setCDN] = useState({}); // Initial CDN value
     const [channels, setChannels] = useState([]); // Initial CDN value

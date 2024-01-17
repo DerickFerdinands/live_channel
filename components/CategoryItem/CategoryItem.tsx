@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 const CategoryItem = ({channelData}) => {
 
     const router = useRouter();
+    // @ts-ignore
     const { cdn, setCDN } = useContext(CDNContext);
 
     return (

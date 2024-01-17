@@ -154,7 +154,7 @@ const Page = () => {
                             <div className="p-4 pb-0 flex flex-col items-center">
                                 <div className=" w-3/4 scroll-m-0">
                                     {
-                                        channels.map(((category, index) => <Category key={index} data={category}/>))
+                                        channels.map(((category:any, index:any) => <Category key={index} data={category}/>))
                                     }
                                 </div>
                             </div>
