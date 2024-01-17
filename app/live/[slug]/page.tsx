@@ -26,7 +26,9 @@ import Link from "next/link";
 
 const Page = () => {
 
+    // @ts-ignore
     const {cdn, setCDN} = useContext(CDNContext);
+    // @ts-ignore
     const {channels, setChannels} = useContext(ChannelContext);
     const [text, setText] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
