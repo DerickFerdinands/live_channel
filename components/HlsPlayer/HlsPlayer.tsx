@@ -22,7 +22,7 @@ const HLSPlayer = ({cdnUrl}) => {
     }, []);
 
     return (
-        <video className={"h-auto w-full max-h-full rounded-2xl"} ref={videoRef} controls/>
+        <video className={"h-auto w-full max-h-full rounded-md"} ref={videoRef} controls/>
 
     );
 };

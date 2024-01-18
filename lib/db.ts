@@ -1,9 +1,9 @@
 const mysql = require('mysql2/promise'); // Import promise-based version
 
 const pool = mysql.createPool({
-    host: 'testrmdb.ca8kj24hg2kr.us-east-2.rds.amazonaws.com',
-    user: 'admin',
-    password: '1qaz2wsx',
+    host: '127.0.0.1',
+    user: 'root',
+    password: '1234',
     port:3306,
     database: 'live',
     connectionLimit: 1, // Adjust as needed

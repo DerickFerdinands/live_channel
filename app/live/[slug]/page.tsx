@@ -1,7 +1,7 @@
 'use client'
 
 import HlsPlayer from "@/components/HlsPlayer/HlsPlayer";
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {CDNContext} from "@/contexts/cdn";
 import Image from "next/image";
 import {Input} from "@/components/ui/input"
@@ -23,20 +23,90 @@ import {ChannelContext} from "@/contexts/Channels";
 import Category from "@/components/CategoryCarousel/category";
 import {ChevronLeftIcon} from "@radix-ui/react-icons";
 import Link from "next/link";
+import { getAuth, signInAnonymously } from "firebase/auth";
+import {firebaseApp} from "@/lib/firebase";
+import {collection, query, where, onSnapshot, doc, setDoc, addDoc, orderBy, limit} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+
+
 
 const Page = () => {
 
+    const app = firebaseApp;
+    const db = getFirestore(app);
     // @ts-ignore
     const {cdn, setCDN} = useContext(CDNContext);
     // @ts-ignore
     const {channels, setChannels} = useContext(ChannelContext);
     const [text, setText] = useState('');
+    const [messages, setMessages] = useState(Array);
     const [showEmoji, setShowEmoji] = useState(false);
+
+    const scrollableElementRef = useRef(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        signInAnonymously(auth)
+            .then(() => {
+                // Signed in..
+
+
+                const q = query(collection(db, "chat"),
+                    where("channel_id", "==", cdn.id),orderBy("date", "asc"),
+                    limit(20)
+                    );
+                const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    setMessages([])
+                    querySnapshot.forEach((doc) => {
+                        console.log(doc.data())
+
+                        setMessages((msges)=>[...msges,{user:doc.data().user_identifier, message:doc.data().message}])
+                    });
+
+                });
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ...
+            });
+    }, []);
+
+
 
     // @ts-ignore
     const handleEmojiSelect = (emoji) => {
         setText((txt: string) => txt + emoji.emoji);
     };
+
+    const handleTextOnChange = async (e:any) =>{
+        setText(e.target.value)
+    }
+
+
+    const handleTextOnKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        console.log(text)
+        if (e.key === 'Enter' && text.length >0) {
+            setText("")
+            setShowEmoji(false)
+            e.preventDefault(); // Prevent the default behavior of Enter in a text field (e.g., new line)
+            const chatCollection = collection(db, "chat");
+
+            const docRef = await addDoc(chatCollection, {
+                channel_id: cdn.id,
+                message: text,
+                user_identifier: "Derick Ferdinands",
+                date:new Date()
+            });
+
+            // @ts-ignore
+            // scrollableElementRef.current.scrollTo(0, 1000)
+
+
+            console.log("Document added with ID: ", docRef.id); // Access the generated ID
+        }
+    }
+
 
     const tags = Array.from({length: 50}).map(
         (_, i, a) => `v1.2.0-beta.${a.length - i}`
@@ -45,41 +115,48 @@ const Page = () => {
     // @ts-ignore
     return (
         <>
-            <div className={"h-screen max-h-screen "}>
+            <div className={""}>
                 <div className={"flex justify-start"}>
                     <Link href={'/'}>
                     <Button className={"ms-10 mt-5"} variant="outline"> <ChevronLeftIcon className="h-4 w-4"/> Back To
                         Home </Button>
                     </Link>
                 </div>
-                <div style={{backgroundColor: '#0F0F0F'}} className={"flex relative gap-5 px-10 mt-5 h-4/5 w-full"}>
-                    <div className={"w-3/4"}>
+                <div  style={{backgroundColor: '#0F0F0F',maxHeight:'calc(100vh/4 *3)'}} className={"relative overflow-scroll flex lg:flex-row flex-col  gap-5 px-10 mt-5 h-4/5 w-full "}>
+                    <div className={"w-full lg:w-3/4 "}>
                         <HlsPlayer cdnUrl={cdn.cdn_url}/>
                     </div>
 
 
-                    <div className={"w-1/4  h-full  border-2 rounded-2xl flex flex-col justify-start relative"}>
+                    <div  className={"w-full lg:w-1/4 h-full  border-2 rounded-md flex flex-col justify-start relative"}>
                         <div className={"border-b-2"}>
                             <h5 className="scroll-m-20 p-3 text-lg font-light tracking-tight">
                                 Live Chat
                             </h5>
                         </div>
-                        <ScrollArea className="h-full w-full rounded-md border">
-                            <div className="p-4">
-                                {tags.map((tag) => (
+                        <ScrollArea  style={{height:'calc(100vh/12 *7.5)'}} className=" w-full rounded-md border ">
+                            <div className="p-4 overflow-scroll">
+                                {messages.map((msge:any, index) => (
                                     <>
-                                        <div key={tag} className="text-sm">
-                                            {tag}
+                                        <div className="flex gap-3">
+                                            <div>
+                                                <div className={"h-10 aspect-square rounded-full bg-amber-100 flex justify-center items-center"}>
+                                                    <h5 className={"w-max h-max text-black"}>{msge.user[0]}</h5>
+                                                </div>
+                                            </div>
+                                            <div key={index} className="text-sm flex flex-col">
+                                                <p>{msge.user}</p>
+                                                <h5>{msge.message}</h5>
+                                            </div>
                                         </div>
+
                                         <Separator className="my-2"/>
                                     </>
                                 ))}
                             </div>
                         </ScrollArea>
                         <div className={"p-3 flex gap-3 justify-center items-center"}>
-                            <Input onChange={(e) => {
-                                setText(e.target.value)
-                            }} value={text} type="text" placeholder="Chat..."/>
+                            <Input onKeyDown={handleTextOnKeyDown}  onChange={handleTextOnChange} value={text} type="text" placeholder="Chat..."/>
                             <h1 onClick={() => setShowEmoji((val) => !val)} className={"text-2xl cursor-pointer"}>😎</h1>
                             {/*     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
                                  enable-background="new 0 0 512 512" viewBox="0 0 512 512" id="emoji">
@@ -119,7 +196,7 @@ const Page = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"w-full flex justify-start px-10 py-0 gap-3"}>
+                <div className={"w-full flex justify-start px-10 py-0 gap-3 mb-20 mt-5"}>
                     <div className={"bg-neutral-800 rounded-full p-2"}>
                         <Image
                             src={cdn.image_url}
@@ -142,7 +219,7 @@ const Page = () => {
                 <Drawer>
                     <DrawerTrigger asChild>
                         <Button style={{position: 'fixed', width: 'auto'}}
-                                className={"fixed bottom-1 m-1 left-0 right-0 m-auto"} variant="outline">More
+                                className={"fixed bottom-0 left-0 right-0 m-auto"} variant="outline">More
                             Channels</Button>
                     </DrawerTrigger>
                     <DrawerContent>
